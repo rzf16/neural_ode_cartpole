@@ -62,6 +62,7 @@ class Cartpole:
     # Returns the layout for state trajectory plotting
     # @output [np.ndarray (AxB)]: layout for state trajectory plotting, where AxB >= state_dim and
     #                             each element is the index to a state variable
+    @classmethod
     def get_state_plot_layout(cls) -> np.ndarray:
         return np.array([
             [0,2],
@@ -71,6 +72,7 @@ class Cartpole:
     # Returns the layout for control trajectory plotting
     # @output [np.ndarray (AxB)]: layout for control trajectory plotting, where AxB >= control_dim and
     #                             each element is the index to a control variable
+    @classmethod
     def get_control_plot_layout(cls) -> np.ndarray:
         return np.array([[0]])
 

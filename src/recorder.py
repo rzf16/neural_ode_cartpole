@@ -4,6 +4,7 @@ Author: rzfeng
 '''
 import os
 import shutil
+import yaml
 from dataclasses import dataclass
 from typing import Optional, List, Tuple
 
@@ -31,31 +32,27 @@ class Trajectory:
         return torch.stack(self.data).numpy(), np.array(self.timestamps)
 
 
-# Class for system data
-@dataclass
-class SystemTrajectory:
-    state_traj: Trajectory
-    control_traj: Trajectory
-
-
 # Class for data recording and visualization
 class DataRecorder:
-    def __init__(self):
-        self.data = SystemTrajectory(Trajectory([],[]),Trajectory([],[]))
+    # @input keys [List[str]]: list of data keys
+    def __init__(self, keys: List[str]):
+        self.state_trajs = {key: Trajectory([],[]) for key in keys}
+        self.control_traj = Trajectory([],[])
 
     # Logs a batch of states
+    # @input key [str]: data key
     # @input s [torch.tensor (T x state_dim)]: batch of states to add
     # @input t [torch.tensor (T)]: timestamps
-    def log_state(self, s: torch.tensor, t: torch.tensor):
-        self.data.state_traj.data.extend(list(s))
-        self.data.state_traj.timestamps.extend(t.tolist())
+    def log_state(self, key: str, s: torch.tensor, t: torch.tensor):
+        self.state_trajs[key].data.extend(list(s))
+        self.state_trajs[key].timestamps.extend(t.tolist())
 
     # Logs a batch of controls
     # @input u [torch.tensor (T x control_dim)]: batch of controls to add
     # @input t [torch.tensor (T)]: timestamps
     def log_control(self, u: torch.tensor, t: torch.tensor):
-        self.data.control_traj.data.extend(list(u))
-        self.data.control_traj.timestamps.extend(t.tolist())
+        self.control_traj.data.extend(list(u))
+        self.control_traj.timestamps.extend(t.tolist())
 
     # Writes recorded data to disk as NumPy arrays
     # @input cfg_path [str]: path to configuration file
@@ -73,12 +70,14 @@ class DataRecorder:
         shutil.copy(cfg_path, os.path.join(write_dir, "cfg.yaml"))
 
         # Write data as NumPy arrays
-        states, state_times = self.data.state_traj.as_np()
-        controls, control_times = self.data.state_traj.as_np()
-        np.save(os.path.join(write_dir, "states.npy"), states)
-        np.save(os.path.join(write_dir, "state_times.npy"), state_times)
+        controls, control_times = self.control_traj.as_np()
         np.save(os.path.join(write_dir, "controls.npy"), controls)
         np.save(os.path.join(write_dir, "control_times.npy"), control_times)
+
+        for key, state_traj in self.state_trajs.items():
+            states, state_times = state_traj.as_np()
+            np.save(os.path.join(write_dir, f"{key}_states.npy"), states)
+            np.save(os.path.join(write_dir, f"{key}_state_times.npy"), state_times)
 
         print(f"[Recorder] Data written to {write_dir}!")
 
@@ -86,23 +85,25 @@ class DataRecorder:
     # @input dir [str]: directory to load from (EXCLUDING "data/")
     def from_data(self, dir: str):
         load_dir = os.path.join(DATA_PATH, dir)
+        cfg = yaml.safe_load(open(os.path.join(load_dir, "cfg.yaml")))
+        keys = [key for key in cfg["data_keys"]] # Is this robust? Maybe use substrings instead?
 
         # Load data from NumPy arrays
-        states = np.load(os.path.join(load_dir, "states.npy"))
-        state_times = np.load(os.path.join(load_dir, "state_times.npy"))
         controls = np.load(os.path.join(load_dir, "controls.npy"))
         control_times = np.load(os.path.join(load_dir, "control_times.npy"))
-
-        states = [torch.from_numpy(state) for state in states]
-        state_times = state_times.tolist()
         controls = [torch.from_numpy(control) for control in controls]
         control_times = control_times.tolist()
+        self.control_traj = Trajectory(controls, control_times)
 
-        self.data = SystemTrajectory(Trajectory(states, state_times), Trajectory(controls, control_times))
+        for key in keys:
+            states = np.load(os.path.join(load_dir, f"{key}_states.npy"))
+            state_times = np.load(os.path.join(load_dir, f"{key}_state_times.npy"))
+            states = [torch.from_numpy(state) for state in states]
+            state_times = state_times.tolist()
+            self.state_trajs[key] = Trajectory(states, state_times)
 
     # Plots the state trajectory
-    def plot_state_traj(self):
-        states, times = self.data.state_traj.as_np()
+    def plot_state_trajs(self):
         layout = Cartpole.get_state_plot_layout()
         description = Cartpole.get_state_description()
 
@@ -113,14 +114,18 @@ class DataRecorder:
         for i, row in enumerate(ax):
             for j, col in enumerate(row):
                 if layout[i,j] >= 0:
-                    col.plot(times, states[:,layout[i,j]])
-                    col.set_ylabel(description[layout[i,j]].name)
+                    for key, state_traj in self.state_trajs.items():
+                        states, times = state_traj.as_np()
+                        col.plot(times, states[:,layout[i,j]], label=key)
+                        col.set_ylabel(description[layout[i,j]].name)
 
+        handles, labels = ax[-1,-1].get_legend_handles_labels()
+        fig.legend(handles, labels, loc="outside upper right")
         plt.show()
 
     # Plots the control trajectory
     def plot_control_traj(self):
-        controls, times = self.data.control_traj.as_np()
+        controls, times = self.control_traj.as_np()
         layout = Cartpole.get_control_plot_layout()
         description = Cartpole.get_control_description()
 
@@ -138,15 +143,16 @@ class DataRecorder:
 
     # Animates the 2D trajectory of vehicles
     # @input cartpole [Cartpole]: Cartpole object
+    # @input key [str]: key to visualize
     # @input n_frames [Optional[int]]: number of frames to animate
     # @input fps [int]: frames per second
     # @input end_wait [float]: seconds to wait at the end before finishing the animation
     # @input write [Optional[str]]: filename to write the animation to (EXCLUDING "media/""); None indicates not to write
-    def animate2d(self, cartpole: Cartpole, n_frames: Optional[int] = None, fps: int = 5, end_wait: float = 1.0, write: Optional[str] = None):
+    def animate2d(self, cartpole: Cartpole, key: str, n_frames: Optional[int] = None, fps: int = 5, end_wait: float = 1.0, write: Optional[str] = None):
         fig = plt.figure()
         ax = plt.axes(aspect="equal")
 
-        states, times = self.data.state_traj.as_np()
+        states, times = self.state_trajs[key].as_np()
 
         # Plot all patches to get the axis limits
         for state in states:
