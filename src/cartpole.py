@@ -108,7 +108,7 @@ class Cartpole:
         sintheta = torch.sin(theta)
         costheta = torch.cos(theta)
 
-        temp = (u + self.ml_pole * dtheta.square() * sintheta) / self.m_total
+        temp = (u.squeeze(1) + self.ml_pole * dtheta.square() * sintheta) / self.m_total
 
         ds = torch.zeros_like(s)
         ds[:,0] = dx
@@ -144,28 +144,34 @@ class Cartpole:
 
     # Forward-integrates the dynamics of the system given a start state and a control trajectory
     # @input s0 [torch.tensor (state_dim)]: initial state
-    # @input u [torch.tensor (T x control_dim)]: linear spline control trajectory
+    # @input u [torch.tensor (T x control_dim)]: piecewise control trajectory
     # @input t_span [Tuple(float, float)]: time span
     # @input t_eval Optional[torch.tensor (N)]: evaluation time points
     # @output [torch.tensor (N x state_dim)]: state trajectory
     def integrate(self, s0: torch.tensor, u: torch.tensor, t_span: Tuple[float, float], t_eval: Optional[torch.tensor] = None) -> torch.tensor:
         t_spaced = torch.linspace(t_span[0], t_span[1], u.size(0))
         t_eval = t_spaced if t_eval is None else t_eval
+        dt = (t_span[1] - t_span[0]) / u.size(0)
 
         # Wraps the continuous dynamics into the form required by the ODE solver
         # @input t [torch.tensor ()]: time point
         # @input s [torch.tensor (state_dim)]: state
         # @output [torch.tensor (state_dim)]: state derivative
         def ode_dynamics(t: torch.tensor, s: torch.tensor):
-            u_t = torch.tensor([np.interp(t, t_spaced, u[:,i].numpy()) for i in range(self.control_dim())])
+            # Piecewise!
+            # u_t = torch.tensor([np.interp(t, t_spaced, u[:,i].numpy()) for i in range(self.control_dim())])
+            t_idx = min(torch.floor(t / dt).int(), u.size(0)-1)
+            u_t = u[t_idx,:]
             ds_t = self.continuous_dynamics(t.unsqueeze(0), s.unsqueeze(0), u_t.unsqueeze(0))
             return ds_t.squeeze(0)
 
+        # sol = odeint(ode_dynamics, s0, t_eval, method="dopri5")
         sol = odeint(ode_dynamics, s0, t_eval, method="rk4") # Dopri5 was giving some issues with step size
+        # sol = odeint(ode_dynamics, s0, t_eval, method="rk4", options={"step_size": dt/10}) # Dopri5 was giving some issues with step size
         return sol, t_eval
 
     # Applies a control sequence to the system
-    # @input u [torch.tensor (T x control_dim)]: linear spline control trajectory
+    # @input u [torch.tensor (T x control_dim)]: piecewise control trajectory
     # @input t_span [Tuple(float, float)]: time duration
     # @input t_eval Optional[torch.tensor (N)]: evaluation time points
     # @output [torch.tensor (N x state_dim)]: state trajectory

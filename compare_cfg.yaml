@@ -1,0 +1,116 @@
+---
+models:
+  - name: "residual_nn_5_1000"
+    path: "models/residual_nn_5_1000.pth"
+    type: "residual_nn"
+    parameters: []
+
+  # - name: "neural_ode_euler_5_1000_small"
+  #   path: "models/neural_ode_euler_5_1000_small.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "euler"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # - name: "neural_ode_dopri5_5_1000_small_tol12"
+  #   path: "models/neural_ode_dopri5_5_1000_small_tol12.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "dopri5"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.1
+  #     atol: 0.01
+  #     options: {}
+
+  # - name: "neural_ode_dopri5_5_1000_small_tol23"
+  #   path: "models/neural_ode_dopri5_5_1000_small_tol23.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "dopri5"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.01
+  #     atol: 0.001
+  #     options: {}
+
+  # - name: "neural_ode_dopri5_5_1000_small_tol34"
+  #   path: "models/neural_ode_dopri5_5_1000_small_tol34.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "dopri5"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # - name: "neural_ode_dopri5_5_1000_small_tol45"
+  #   path: "models/neural_ode_dopri5_5_1000_small_tol45.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "dopri5"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.0001
+  #     atol: 0.00001
+  #     options: {}
+
+  - name: "neural_ode_explicit_adams_5_1000_small"
+    path: "models/neural_ode_explicit_adams_5_1000_small.pth"
+    type: "neural_ode"
+    parameters:
+      method: "explicit_adams"
+      n_layers: 2
+      width: 100
+      rtol: 0.001
+      atol: 0.0001
+      options: {}
+
+  - name: "neural_ode_explicit_adams_5_1000_tiny"
+    path: "models/neural_ode_explicit_adams_5_1000_tiny.pth"
+    type: "neural_ode"
+    parameters:
+      method: "explicit_adams"
+      n_layers: 2
+      width: 50
+      rtol: 0.001
+      atol: 0.0001
+      options: {}
+
+  - name: "neural_ode_explicit_adams_5_1000_big"
+    path: "models/neural_ode_explicit_adams_5_1000_big.pth"
+    type: "neural_ode"
+    parameters:
+      method: "explicit_adams"
+      n_layers: 3
+      width: 50
+      rtol: 0.001
+      atol: 0.0001
+      options: {}
+
+  # - name: "neural_ode_rk4_5_1000_small_step02"
+  #   path: "models/neural_ode_rk4_5_1000_small_step02.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "rk4"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {"step_size": 0.02}
+
+  # - name: "neural_ode_rk4_5_1000_small_step10"
+  #   path: "models/neural_ode_rk4_5_1000_small_step10.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "rk4"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {"step_size": 0.1}

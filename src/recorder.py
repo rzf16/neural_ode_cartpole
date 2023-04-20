@@ -3,6 +3,7 @@ Data recording and visualization
 Author: rzfeng
 '''
 import os
+import pickle
 import shutil
 import yaml
 from dataclasses import dataclass
@@ -18,7 +19,8 @@ from matplotlib.patches import Patch
 from src.cartpole import Cartpole
 
 
-DATA_PATH = "data/"
+LOG_PATH = "data/logs/"
+TRAINING_DATA_PATH = "data/training/"
 MEDIA_DIR = "media/"
 
 
@@ -28,8 +30,22 @@ class Trajectory:
     data: List[torch.tensor]
     timestamps: List[float]
 
+    def __len__(self):
+        return len(self.data)
+
+    def log_datum(self, datum: torch.tensor, time: float):
+        self.data.append(datum)
+        self.timestamps.append(time)
+
+    def log_data_batch(self, data: torch.tensor, times: torch.tensor):
+        self.data.extend(list(data))
+        self.timestamps.extend(times.tolist())
+
     def as_np(self) -> Tuple:
         return torch.stack(self.data).numpy(), np.array(self.timestamps)
+
+    def as_torch(self) -> Tuple:
+        return torch.stack(self.data), torch.tensor(self.timestamps)
 
 
 # Class for data recording and visualization
@@ -44,15 +60,13 @@ class DataRecorder:
     # @input s [torch.tensor (T x state_dim)]: batch of states to add
     # @input t [torch.tensor (T)]: timestamps
     def log_state(self, key: str, s: torch.tensor, t: torch.tensor):
-        self.state_trajs[key].data.extend(list(s))
-        self.state_trajs[key].timestamps.extend(t.tolist())
+        self.state_trajs[key].log_data_batch(s,t)
 
     # Logs a batch of controls
     # @input u [torch.tensor (T x control_dim)]: batch of controls to add
     # @input t [torch.tensor (T)]: timestamps
     def log_control(self, u: torch.tensor, t: torch.tensor):
-        self.control_traj.data.extend(list(u))
-        self.control_traj.timestamps.extend(t.tolist())
+        self.control_traj.log_data_batch(u,t)
 
     # Writes recorded data to disk as NumPy arrays
     # @input cfg_path [str]: path to configuration file
@@ -60,10 +74,10 @@ class DataRecorder:
     def write_data(self, cfg_path: str, prefix: str = "run"):
         # Get the current run number and make the corresponding directory
         idx = 1
-        write_dir = os.path.join(DATA_PATH, prefix+f"{idx:03}")
+        write_dir = os.path.join(LOG_PATH, prefix+f"{idx:03}")
         while os.path.exists(write_dir):
             idx += 1
-            write_dir = os.path.join(DATA_PATH, prefix+f"{idx:03}")
+            write_dir = os.path.join(LOG_PATH, prefix+f"{idx:03}")
         os.makedirs(write_dir)
 
         # Copy the configuration info
@@ -83,8 +97,8 @@ class DataRecorder:
 
     # Loads trajectory data from a directory
     # @input dir [str]: directory to load from (EXCLUDING "data/")
-    def from_data(self, dir: str):
-        load_dir = os.path.join(DATA_PATH, dir)
+    def from_np(self, dir: str):
+        load_dir = os.path.join(LOG_PATH, dir)
         cfg = yaml.safe_load(open(os.path.join(load_dir, "cfg.yaml")))
         keys = [key for key in cfg["data_keys"]] # Is this robust? Maybe use substrings instead?
 
@@ -101,6 +115,20 @@ class DataRecorder:
             states = [torch.from_numpy(state) for state in states]
             state_times = state_times.tolist()
             self.state_trajs[key] = Trajectory(states, state_times)
+
+    # Loads trajectory data from a pickle file
+    # @input filename [str]: filename to load from (EXCLUDING "data/training_data/")
+    # @input key [str]: data key to store with
+    def from_pkl(self, filename: str, key: str):
+        # Load data
+        # data = pickle.load(open(os.path.join(TRAINING_DATA_PATH, filename), "rb"))
+        data = [pickle.load(open(os.path.join(TRAINING_DATA_PATH, filename), "rb"))[4]]
+        states = torch.cat([traj["states"] for traj in data], dim=0)
+        state_times = torch.cat([traj["state_times"] for traj in data])
+        self.state_trajs[key] = Trajectory(list(states), state_times.tolist())
+        controls = torch.cat([traj["controls"] for traj in data], dim=0)
+        control_times = torch.cat([traj["control_times"] for traj in data])
+        self.control_traj = Trajectory(list(controls), control_times.tolist())
 
     # Plots the state trajectory
     def plot_state_trajs(self):

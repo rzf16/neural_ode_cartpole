@@ -1,0 +1,50 @@
+---
+dt: 0.1
+
+system:
+  m_cart: 1.0
+  m_pole: 0.1
+  l: 0.5
+  vis_params:
+    cart_width: 1.0
+    cart_height: 0.5
+    pole_thickness: 2
+    cart_color: "blue"
+    pole_color: "red"
+
+  u_min: [-30.0]
+  u_max: [30.0]
+  s_min: [-5.0, -10.0, -3.1416, -15.708]
+  s_max: [5.0, 10.0, 3.1416, 15.708]
+
+task:
+  s0: [0.0, 0.0, 3.1416, 0.0]
+  goal: [0.0, 0.0, 0.0, 0.0]
+  tolerance: [0.1, 0.05, 0.1, 0.05]
+
+# MPPI
+mppi:
+  dynamics_type: "neural_ode"
+  dynamics_path: "models/neural_ode_explicit_adams_5_1000_big.pth"
+  dynamics_params:
+    method: "explicit_adams"
+    n_layers: 3
+    width: 50
+    rtol: 0.001
+    atol: 0.0001
+    options: {}
+  Q: [7.5, 1.0, 5.0, 1.0]
+  sigma: [[25.0]]
+  horizon: 10
+  n_samples: 1000
+  lambda_: 0.01
+  n_warm_start_steps: 10
+  max_steps: 250
+  stop_on_goal: True
+
+# Visualization
+vis:
+  plot_state_traj: True
+  plot_control_traj: False
+  animate: True
+  model_reset_freq: 10
