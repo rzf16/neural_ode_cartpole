@@ -20,16 +20,18 @@ system:
 task:
   s0: [0.0, 0.0, 3.1416, 0.0]
   goal: [0.0, 0.0, 0.0, 0.0]
-  tolerance: [0.1, 0.05, 0.1, 0.05]
+  tolerance: [0.2, 0.05, 0.1, 0.05]
 
 # MPPI
 mppi:
   dynamics_type: "neural_ode"
-  dynamics_path: "models/neural_ode_explicit_adams_5_1000_big.pth"
+  dynamics_path: "models/neural_ode_explicit_adams_5_1000_small.pth"
+  # dynamics_type: "residual_nn"
+  # dynamics_path: "models/residual_nn_5_1000.pth"
   dynamics_params:
     method: "explicit_adams"
-    n_layers: 3
-    width: 50
+    n_layers: 2
+    width: 100
     rtol: 0.001
     atol: 0.0001
     options: {}
@@ -39,12 +41,12 @@ mppi:
   n_samples: 1000
   lambda_: 0.01
   n_warm_start_steps: 10
-  max_steps: 250
+  max_steps: 150
   stop_on_goal: True
 
 # Visualization
 vis:
-  plot_state_traj: True
+  plot_state_traj: False
   plot_control_traj: False
-  animate: True
+  animate: False
   model_reset_freq: 10

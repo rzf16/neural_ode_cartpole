@@ -5,6 +5,18 @@ models:
     type: "residual_nn"
     parameters: []
 
+  - name: "neural_ode_explicit_adams_5_1000_small"
+    path: "models/neural_ode_explicit_adams_5_1000_small.pth"
+    type: "neural_ode"
+    parameters:
+      method: "explicit_adams"
+      n_layers: 2
+      width: 100
+      rtol: 0.001
+      atol: 0.0001
+      options: {}
+
+  # --------------- ODE SOLVERS ---------------
   # - name: "neural_ode_euler_5_1000_small"
   #   path: "models/neural_ode_euler_5_1000_small.pth"
   #   type: "neural_ode"
@@ -16,16 +28,16 @@ models:
   #     atol: 0.0001
   #     options: {}
 
-  # - name: "neural_ode_dopri5_5_1000_small_tol12"
-  #   path: "models/neural_ode_dopri5_5_1000_small_tol12.pth"
-  #   type: "neural_ode"
-  #   parameters:
-  #     method: "dopri5"
-  #     n_layers: 2
-  #     width: 100
-  #     rtol: 0.1
-  #     atol: 0.01
-  #     options: {}
+  # # - name: "neural_ode_dopri5_5_1000_small_tol12"
+  # #   path: "models/neural_ode_dopri5_5_1000_small_tol12.pth"
+  # #   type: "neural_ode"
+  # #   parameters:
+  # #     method: "dopri5"
+  # #     n_layers: 2
+  # #     width: 100
+  # #     rtol: 0.1
+  # #     atol: 0.01
+  # #     options: {}
 
   # - name: "neural_ode_dopri5_5_1000_small_tol23"
   #   path: "models/neural_ode_dopri5_5_1000_small_tol23.pth"
@@ -49,49 +61,16 @@ models:
   #     atol: 0.0001
   #     options: {}
 
-  # - name: "neural_ode_dopri5_5_1000_small_tol45"
-  #   path: "models/neural_ode_dopri5_5_1000_small_tol45.pth"
-  #   type: "neural_ode"
-  #   parameters:
-  #     method: "dopri5"
-  #     n_layers: 2
-  #     width: 100
-  #     rtol: 0.0001
-  #     atol: 0.00001
-  #     options: {}
-
-  - name: "neural_ode_explicit_adams_5_1000_small"
-    path: "models/neural_ode_explicit_adams_5_1000_small.pth"
-    type: "neural_ode"
-    parameters:
-      method: "explicit_adams"
-      n_layers: 2
-      width: 100
-      rtol: 0.001
-      atol: 0.0001
-      options: {}
-
-  - name: "neural_ode_explicit_adams_5_1000_tiny"
-    path: "models/neural_ode_explicit_adams_5_1000_tiny.pth"
-    type: "neural_ode"
-    parameters:
-      method: "explicit_adams"
-      n_layers: 2
-      width: 50
-      rtol: 0.001
-      atol: 0.0001
-      options: {}
-
-  - name: "neural_ode_explicit_adams_5_1000_big"
-    path: "models/neural_ode_explicit_adams_5_1000_big.pth"
-    type: "neural_ode"
-    parameters:
-      method: "explicit_adams"
-      n_layers: 3
-      width: 50
-      rtol: 0.001
-      atol: 0.0001
-      options: {}
+  # # - name: "neural_ode_dopri5_5_1000_small_tol45"
+  # #   path: "models/neural_ode_dopri5_5_1000_small_tol45.pth"
+  # #   type: "neural_ode"
+  # #   parameters:
+  # #     method: "dopri5"
+  # #     n_layers: 2
+  # #     width: 100
+  # #     rtol: 0.0001
+  # #     atol: 0.00001
+  # #     options: {}
 
   # - name: "neural_ode_rk4_5_1000_small_step02"
   #   path: "models/neural_ode_rk4_5_1000_small_step02.pth"
@@ -114,3 +93,93 @@ models:
   #     rtol: 0.001
   #     atol: 0.0001
   #     options: {"step_size": 0.1}
+
+  # --------------- NETWORK SIZE ---------------
+  # - name: "neural_ode_explicit_adams_5_1000_tiny"
+  #   path: "models/neural_ode_explicit_adams_5_1000_tiny.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 2
+  #     width: 50
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # - name: "neural_ode_explicit_adams_5_1000_big"
+  #   path: "models/neural_ode_explicit_adams_5_1000_big.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 3
+  #     width: 50
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # - name: "neural_ode_explicit_adams_5_1000_huge"
+  #   path: "models/neural_ode_explicit_adams_5_1000_huge.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 3
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # --------------- TIME HORIZON ---------------
+  # - name: "neural_ode_explicit_adams_1_1000_small"
+  #   path: "models/neural_ode_explicit_adams_1_1000_small.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # - name: "neural_ode_explicit_adams_10_1000_small"
+  #   path: "models/neural_ode_explicit_adams_10_1000_small.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
+
+  # --------------- DATA ---------------
+  - name: "residual_nn_5_100"
+    path: "models/residual_nn_5_100.pth"
+    type: "residual_nn"
+    parameters: []
+
+  - name: "residual_nn_5_500"
+    path: "models/residual_nn_5_500.pth"
+    type: "residual_nn"
+    parameters: []
+
+  - name: "neural_ode_explicit_adams_5_100_small"
+    path: "models/neural_ode_explicit_adams_5_100_small.pth"
+    type: "neural_ode"
+    parameters:
+      method: "explicit_adams"
+      n_layers: 2
+      width: 100
+      rtol: 0.001
+      atol: 0.0001
+      options: {}
+
+  - name: "neural_ode_explicit_adams_5_500_small"
+    path: "models/neural_ode_explicit_adams_5_500_small.pth"
+    type: "neural_ode"
+    parameters:
+      method: "explicit_adams"
+      n_layers: 2
+      width: 100
+      rtol: 0.001
+      atol: 0.0001
+      options: {}
