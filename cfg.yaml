@@ -46,7 +46,7 @@ mppi:
 
 # Visualization
 vis:
-  plot_state_traj: False
+  plot_state_traj: True
   plot_control_traj: False
-  animate: False
+  animate: True
   model_reset_freq: 10

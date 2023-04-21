@@ -129,6 +129,16 @@ models:
   #     options: {}
 
   # --------------- TIME HORIZON ---------------
+  - name: "residual_nn_1_1000"
+    path: "models/residual_nn_1_1000.pth"
+    type: "residual_nn"
+    parameters: []
+
+  - name: "residual_nn_10_1000"
+    path: "models/residual_nn_10_1000.pth"
+    type: "residual_nn"
+    parameters: []
+
   # - name: "neural_ode_explicit_adams_1_1000_small"
   #   path: "models/neural_ode_explicit_adams_1_1000_small.pth"
   #   type: "neural_ode"
@@ -152,34 +162,34 @@ models:
   #     options: {}
 
   # --------------- DATA ---------------
-  - name: "residual_nn_5_100"
-    path: "models/residual_nn_5_100.pth"
-    type: "residual_nn"
-    parameters: []
+  # - name: "residual_nn_5_100"
+  #   path: "models/residual_nn_5_100.pth"
+  #   type: "residual_nn"
+  #   parameters: []
 
-  - name: "residual_nn_5_500"
-    path: "models/residual_nn_5_500.pth"
-    type: "residual_nn"
-    parameters: []
+  # - name: "residual_nn_5_500"
+  #   path: "models/residual_nn_5_500.pth"
+  #   type: "residual_nn"
+  #   parameters: []
 
-  - name: "neural_ode_explicit_adams_5_100_small"
-    path: "models/neural_ode_explicit_adams_5_100_small.pth"
-    type: "neural_ode"
-    parameters:
-      method: "explicit_adams"
-      n_layers: 2
-      width: 100
-      rtol: 0.001
-      atol: 0.0001
-      options: {}
+  # - name: "neural_ode_explicit_adams_5_100_small"
+  #   path: "models/neural_ode_explicit_adams_5_100_small.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
 
-  - name: "neural_ode_explicit_adams_5_500_small"
-    path: "models/neural_ode_explicit_adams_5_500_small.pth"
-    type: "neural_ode"
-    parameters:
-      method: "explicit_adams"
-      n_layers: 2
-      width: 100
-      rtol: 0.001
-      atol: 0.0001
-      options: {}
+  # - name: "neural_ode_explicit_adams_5_500_small"
+  #   path: "models/neural_ode_explicit_adams_5_500_small.pth"
+  #   type: "neural_ode"
+  #   parameters:
+  #     method: "explicit_adams"
+  #     n_layers: 2
+  #     width: 100
+  #     rtol: 0.001
+  #     atol: 0.0001
+  #     options: {}
